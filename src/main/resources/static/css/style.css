@@ -1,0 +1,58 @@
+form{
+    width: 400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+h3{
+    font-size: 1.3rem;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 0.25rem;
+}
+
+.form-group{
+    margin-bottom: 1rem;
+}
+
+.form-control{
+    display: block;
+    line-height: 1.5;
+    width: 100%;
+}
+
+textarea {
+    resize: none;
+}
+
+label{
+    margin-bottom: 0.25rem;
+    display: inline-block;
+}
+
+form button{
+    align-self: end;
+}
+
+.navbar{
+    display: flex;
+    flex-direction: row;
+    padding: .5rem 1rem;
+    align-items: center;
+    position: relative;
+}
+
+.navbar-nav{
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+}
+
+.nav-link{
+    padding-left: .5rem;
+    padding-right: .5rem;
+}
+
+a.nav-link{
+    text-decoration: none;
+}
