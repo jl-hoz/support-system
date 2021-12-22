@@ -25,15 +25,15 @@ public class User {
     @Column(name = "role", nullable = false)
     private String role;
 
-    @Column(name = "permissions", nullable = false)
-    private String permissions;
+    @Column(name = "active", nullable = false)
+    private Boolean active = true;
 
-    public String getPermissions() {
-        return permissions;
+    public Boolean getActive() {
+        return active;
     }
 
-    public void setPermissions(String permissions) {
-        this.permissions = permissions;
+    public void setActive(Boolean hidden) {
+        this.active = hidden;
     }
 
     public String getRole() {
@@ -82,18 +82,5 @@ public class User {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", email='" + email + '\'' +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", password='" + password + '\'' +
-                ", role='" + role + '\'' +
-                ", permissions='" + permissions + '\'' +
-                '}';
     }
 }

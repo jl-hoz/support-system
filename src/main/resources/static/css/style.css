@@ -5,6 +5,16 @@ form{
     flex-direction: column;
 }
 
+table{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+
 h3{
     font-size: 1.3rem;
     border-bottom: 1px solid #e9ecef;

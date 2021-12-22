@@ -8,7 +8,6 @@
 <body>
 
 <%@ include file="templates/nav.jsp" %>
-<%@ include file="templates/login-form.jsp" %>
 <%@ include file="templates/ticket-table.jsp" %>
 
 </body>
