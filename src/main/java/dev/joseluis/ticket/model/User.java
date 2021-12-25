@@ -1,6 +1,7 @@
 package dev.joseluis.ticket.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 
 @Entity
 @Table(name = "user")
@@ -11,6 +12,7 @@ public class User {
     private Integer id;
 
     @Column(name = "email", nullable = false)
+    @Email
     private String email;
 
     @Column(name = "name", nullable = false)
