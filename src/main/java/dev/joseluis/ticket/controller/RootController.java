@@ -10,28 +10,27 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-public class UserController {
+public class RootController {
 
     @Autowired
     private UserService userService;
 
-    @RequestMapping("/activate")
+    @RequestMapping("/root/activate")
     public String getActivate(@ModelAttribute("user") User user){
-        return "activate";
+        return "activate-root";
     }
 
-    @PostMapping("/activate")
+    @PostMapping("/root/activate")
     public String postActivate(@ModelAttribute("user") User user){
         try {
-            userService.createUserByAdmin(user);
+            userService.createUserByRoot(user);
         } catch (UserException ex) {
             System.err.println("ERROR POST /activate: " + ex.getMessage());
             if(ex.getCause() != null){
                 System.err.println("\t caused by: " + ex.getCause());
             }
-            return "redirect:/activate?error";
+            return "redirect:/root/activate?error";
         }
-        return "redirect:/activate?success";
+        return "redirect:/root/activate?success";
     }
-
 }
