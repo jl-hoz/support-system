@@ -13,6 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class UserController {
@@ -21,6 +23,35 @@ public class UserController {
     private UserService userService;
 
     private final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    @RequestMapping("/activate")
+    public String getActivate(@ModelAttribute("user") User user){
+        return "activate";
+    }
+
+    @PostMapping("/activate")
+    public String postActivate(@ModelAttribute("user") User user){
+        try {
+            String role = getPrincipalRole();
+            if(role.contains("ROOT")){
+                userService.createUserByRoot(user);
+            }else if(role.contains("ADMIN")){
+                userService.createUserByAdmin(user);
+            }
+        } catch (UserException ex) {
+            logger.error("POST /activate: " + ex.getMessage());
+            if(ex.getCause() != null){
+                logger.error("caused by: " + ex.getCause());
+            }
+            return "redirect:/activate?error";
+        }
+        return "redirect:/activate?success";
+    }
+
+    private String getPrincipalRole(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return String.valueOf(authentication.getAuthorities());
+    }
 
 
     @GetMapping("/profile")
@@ -38,7 +69,7 @@ public class UserController {
             if(e.getCause() != null){
                 logger.error("\t caused by: " + e.getCause());
             }
-            return "index";
+            return "error";
         }
         return "profile";
     }

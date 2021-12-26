@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<%@ include file="../templates/nav.jsp" %>
+<%@ include file="templates/nav.jsp" %>
 <%
     if(request.getParameter("error") != null){
         out.println("<div class=\"alert alert-error\">Error creating a user</div>");
@@ -19,7 +19,7 @@
 
 <sec:authorize access="hasAnyRole('ROOT', 'ADMIN')">
 <%--@elvariable id="user" type="dev.joseluis.ticket.model.User"--%>
-    <form:form method="post" action="/admin/activate" modelAttribute="user">
+    <form:form method="post" modelAttribute="user">
     <header>
         <h3>Create new user</h3>
     </header>

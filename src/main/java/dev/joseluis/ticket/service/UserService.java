@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 @Service
@@ -19,36 +20,25 @@ public class UserService {
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     public void createUserByAdmin(User user) throws UserException {
-        try {
-            // Check if email already exists
-            boolean userExists = userRepository.findByEmail(user.getEmail()).isPresent();
-            if(userExists)
-                throw new UserException("email already exists");
-            user.setPassword(UUID.randomUUID().toString());
-            // Admins can create any type of user, except admin and root user
-            if(user.getRole().contentEquals("ROLE_ROOT") || user.getRole().contentEquals("ROLE_ADMIN"))
-                throw new UserException("user do not have necessary permissions for this operation");
-            // Save user to database
-            userRepository.save(user);
-            // Show generated password
-            logger.info("email: " + user.getEmail() + " | generated password: " + user.getPassword());
-        } catch (UserException e) {
-            throw e;
-        } catch (Exception e){
-            throw new UserException("error creating a new user", e);
-        }
+        createUser(user, new String[]{"ROLE_ROOT", "ROLE_ADMIN"});
     }
 
     public void createUserByRoot(User user) throws UserException {
+        createUser(user, new String[]{"ROLE_ROOT"});
+    }
+
+    private void createUser(User user, String[] rolesForbiddenForCreation) throws UserException{
         try {
             // Check if email already exists
             boolean userExists = userRepository.findByEmail(user.getEmail()).isPresent();
             if(userExists)
                 throw new UserException("email already exists");
+            // Generate random password
             user.setPassword(UUID.randomUUID().toString());
-            // Root can create any type of user, except root
-            if(user.getRole().contentEquals("ROLE_ROOT"))
+            // Roles forbidden to create new users
+            if(Arrays.stream(rolesForbiddenForCreation).anyMatch(role -> user.getRole().contentEquals(role))){
                 throw new UserException("user do not have necessary permissions for this operation");
+            }
             // Save user to database
             userRepository.save(user);
             // Show generated password
