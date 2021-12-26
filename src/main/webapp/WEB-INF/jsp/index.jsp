@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,7 +9,8 @@
 <body>
 
 <%@ include file="templates/nav.jsp" %>
-<%@ include file="templates/ticket-table.jsp" %>
-
+<sec:authorize access="!isAuthenticated()">
+    <p>You are not logged in!</p>
+</sec:authorize>
 </body>
 </html>

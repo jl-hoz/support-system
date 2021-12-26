@@ -17,7 +17,7 @@ public class RootController {
 
     @RequestMapping("/root/activate")
     public String getActivate(@ModelAttribute("user") User user){
-        return "activate-root";
+        return "root/activate-root";
     }
 
     @PostMapping("/root/activate")

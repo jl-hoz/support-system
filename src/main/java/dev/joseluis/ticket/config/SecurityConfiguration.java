@@ -26,11 +26,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/root/**").hasRole("ROOT")
                 .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/profile").hasAnyRole("ROOT", "ADMIN", "ANALYST", "SUPPORT", "CUSTOMER")
                 .and().formLogin();
     }
 
     @Bean
     public PasswordEncoder getPasswordEncoder(){
+        // TODO: set BCrypt password encoder
         return NoOpPasswordEncoder.getInstance();
     }
 }

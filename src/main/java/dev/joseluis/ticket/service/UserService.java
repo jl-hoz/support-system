@@ -56,6 +56,12 @@ public class UserService {
         }
     }
 
+    public User getUserByEmail(String email) throws UserException{
+        return userRepository.findByEmail(email).orElseThrow(() -> new UserException("email not found"));
+    }
+
+
+
 //
 //    public void updateUser(User user){
 //        repository.save(user);

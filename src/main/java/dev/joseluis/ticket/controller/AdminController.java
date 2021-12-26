@@ -17,7 +17,7 @@ public class AdminController {
 
     @RequestMapping("/admin/activate")
     public String getActivate(@ModelAttribute("user") User user){
-        return "activate-admin";
+        return "admin/activate-admin";
     }
 
     @PostMapping("/admin/activate")
