@@ -3,6 +3,8 @@ package dev.joseluis.ticket.controller;
 import dev.joseluis.ticket.exception.UserException;
 import dev.joseluis.ticket.model.User;
 import dev.joseluis.ticket.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -15,6 +17,8 @@ public class AdminController {
     @Autowired
     private UserService userService;
 
+    private final Logger logger = LoggerFactory.getLogger(AdminController.class);
+
     @RequestMapping("/admin/activate")
     public String getActivate(@ModelAttribute("user") User user){
         return "admin/activate-admin";
@@ -25,9 +29,9 @@ public class AdminController {
         try {
             userService.createUserByAdmin(user);
         } catch (UserException ex) {
-            System.err.println("ERROR POST /activate: " + ex.getMessage());
+            logger.error("POST /admin/activate: " + ex.getMessage());
             if(ex.getCause() != null){
-                System.err.println("\t caused by: " + ex.getCause());
+                logger.error("caused by: " + ex.getCause());
             }
             return "redirect:/admin/activate?error";
         }

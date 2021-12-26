@@ -3,6 +3,8 @@ package dev.joseluis.ticket.service;
 import dev.joseluis.ticket.exception.UserException;
 import dev.joseluis.ticket.model.User;
 import dev.joseluis.ticket.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,8 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    private final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     public void createUserByAdmin(User user) throws UserException {
         try {
@@ -27,7 +31,7 @@ public class UserService {
             // Save user to database
             userRepository.save(user);
             // Show generated password
-            System.out.println("email: " + user.getEmail() + " | generated password: " + user.getPassword());
+            logger.info("email: " + user.getEmail() + " | generated password: " + user.getPassword());
         } catch (UserException e) {
             throw e;
         } catch (Exception e){
@@ -48,7 +52,7 @@ public class UserService {
             // Save user to database
             userRepository.save(user);
             // Show generated password
-            System.out.println("email: " + user.getEmail() + " | generated password: " + user.getPassword());
+            logger.info("email: " + user.getEmail() + " | generated password: " + user.getPassword());
         } catch (UserException e) {
             throw e;
         } catch (Exception e){
