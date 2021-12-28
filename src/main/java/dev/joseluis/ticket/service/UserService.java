@@ -6,6 +6,10 @@ import dev.joseluis.ticket.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.AuthenticatedPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -56,22 +60,40 @@ public class UserService {
 
 
 
-//
-//    public void updateUser(User user){
-//        repository.save(user);
-//    }
-//
-//    public User getUserById(int id){
-//        return repository.getById(id);
-//    }
-//
-//    public User getUserByIdAndPassword(String email, String password){
-//        User user = repository.getByEmail(email, password);
-//        return user;
-//    }
-//
-//    public void deleteUser(int id){
-//        repository.deleteById(id);
-//    }
+
+    public void updateProfile(User user) throws UserException {
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            User updatedUser = userRepository.findByEmail(userDetails.getUsername())
+                    .orElseThrow(() -> new UserException("email of authenticated user do no exists"));
+            // Map only necessary elements
+            updatedUser.setEmail(user.getEmail());
+            updatedUser.setName(user.getName());
+            updatedUser.setSurname(user.getSurname());
+            userRepository.save(updatedUser);
+        }catch (UserException ex){
+            throw ex;
+        }catch (Exception ex){
+            throw new UserException("error updating user profile", ex);
+        }
+
+    }
+    public void changePassword(User user) throws UserException {
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            User updatedUser = userRepository.findByEmail(userDetails.getUsername())
+                    .orElseThrow(() -> new UserException("email of authenticated user do no exists"));
+            // Map only necessary elements
+            updatedUser.setPassword(user.getPassword());
+            userRepository.save(updatedUser);
+        }catch (UserException ex){
+            throw ex;
+        }catch (Exception ex){
+            throw new UserException("error  user profile", ex);
+        }
+
+    }
 
 }

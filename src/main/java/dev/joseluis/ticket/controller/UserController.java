@@ -2,7 +2,9 @@ package dev.joseluis.ticket.controller;
 
 import dev.joseluis.ticket.exception.UserException;
 import dev.joseluis.ticket.model.User;
+import dev.joseluis.ticket.repository.UserRepository;
 import dev.joseluis.ticket.service.UserService;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,7 @@ public class UserController {
     @PostMapping("/activate")
     public String postActivate(@ModelAttribute("user") User user){
         try {
+            user.setActive(true);
             String role = getPrincipalRole();
             if(role.contains("ROOT")){
                 userService.createUserByRoot(user);
@@ -72,6 +75,59 @@ public class UserController {
             return "error";
         }
         return "profile";
+    }
+
+    @GetMapping("/profile/edit")
+    public String getEditProfile(@ModelAttribute User user, ModelMap model){
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            user = userService.getUserByEmail(userDetails.getUsername());
+            model.addAttribute("email", user.getEmail());
+            model.addAttribute("name", user.getName());
+            model.addAttribute("surname", user.getSurname());
+        } catch (UserException e) {
+            logger.error("GET /profile/edit: " + e.getMessage());
+            if(e.getCause() != null){
+                logger.error("caused by: " + e.getCause());
+            }
+            return "error";
+        }
+        return "edit-profile";
+    }
+
+    @PostMapping ("/profile/edit")
+    public String postEditProfile(@ModelAttribute User user) {
+        try {
+            userService.updateProfile(user);
+        } catch (UserException e) {
+            logger.error("POST /profile/edit: " + e.getMessage());
+            if (e.getCause() != null) {
+                logger.error("caused by: " + e.getCause());
+            }
+            return "redirect:/profile/edit?error";
+        }
+        return "redirect:/logout";
+    }
+
+
+    @GetMapping("/profile/change-password")
+    public String getChangePassword(@ModelAttribute User user, ModelMap model){
+        return "change-password";
+    }
+
+    @PostMapping ("/profile/change-password")
+    public String postChangePassword(@ModelAttribute User user) {
+        try {
+            userService.changePassword(user);
+        } catch (UserException e) {
+            logger.error("POST /profile/change-password: " + e.getMessage());
+            if (e.getCause() != null) {
+                logger.error("caused by: " + e.getCause());
+            }
+            return "error";
+        }
+        return "redirect:/logout";
     }
 
 }
