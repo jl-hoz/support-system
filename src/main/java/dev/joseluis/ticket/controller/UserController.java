@@ -75,6 +75,31 @@ public class UserController {
         return "redirect:/activate?success";
     }
 
+    @GetMapping("/deactivate")
+    public String getDeactivate(@ModelAttribute("user") User user){
+        return "deactivate";
+    }
+
+    @PostMapping("/deactivate")
+    public String postDeactivate(@ModelAttribute User user){
+        try {
+            String role = getPrincipalRole();
+            if(role.contains("ROOT")){
+                userService.deactivateUserByRoot(user);
+            }else if(role.contains("ADMIN")){
+                userService.deactivateUserByAdmin(user);
+            }
+        } catch (UserException ex) {
+            logger.error("POST /deactivate: " + ex.getMessage());
+            if(ex.getCause() != null){
+                logger.error("caused by: " + ex.getCause());
+            }
+            return "redirect:deactivate?error";
+        }
+
+        return "redirect:deactivate?success";
+    }
+
     private String getPrincipalRole(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return String.valueOf(authentication.getAuthorities());

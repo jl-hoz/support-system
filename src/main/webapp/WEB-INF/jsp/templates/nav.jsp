@@ -12,7 +12,8 @@
             <li><a href="/profile" class="nav-link">profile</a></li>
         </sec:authorize>
         <sec:authorize access="hasAnyRole('ROOT', 'ADMIN')">
-            <li><a href="/activate" class="nav-link">create user</a></li>
+            <li><a href="/activate" class="nav-link">create</a></li>
+            <li><a href="/deactivate" class="nav-link">remove</a></li>
         </sec:authorize>
         <sec:authorize access="isAuthenticated()">
             <li><a href="/logout" class="nav-link">logout</a></li>

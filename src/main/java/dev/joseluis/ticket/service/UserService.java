@@ -103,4 +103,29 @@ public class UserService {
 
     }
 
+    public void deactivateUserByRoot(User user) throws UserException {
+        deactivate(user, new String[]{"ROLE_ROOT"});
+    }
+
+    public void deactivateUserByAdmin(User user) throws UserException{
+        deactivate(user, new String[]{"ROLE_ADMIN", "ROLE_ROOT"});
+    }
+    private void deactivate(User user, String[] rolesForbiddenForDeactivation) throws UserException{
+        try {
+            // Check if email already exists
+            User retrievedUser = userRepository.findByEmail(user.getEmail())
+                    .orElseThrow(() -> new UserException("email do not exists"));
+            // Roles forbidden to deactivate some users
+            if(Arrays.stream(rolesForbiddenForDeactivation)
+                    .anyMatch(role -> retrievedUser.getRole().contentEquals(role))){
+                throw new UserException("user do not have necessary permissions for this operation");
+            }
+            // Toggle user visibilty
+            userRepository.toggleActive(retrievedUser.getEmail(), !retrievedUser.getActive());
+        } catch (UserException e) {
+            throw e;
+        } catch (Exception e){
+            throw new UserException("error deactivating user", e);
+        }
+    }
 }
