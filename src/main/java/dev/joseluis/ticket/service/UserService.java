@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -58,7 +59,13 @@ public class UserService {
         return userRepository.findByEmail(email).orElseThrow(() -> new UserException("email not found"));
     }
 
+    public List<User> getUsersByAdmin(){
+        return userRepository.findAllByRoleNotContainingAndRoleNotContaining("ROLE_ROOT", "ROLE_ADMIN");
+    }
 
+    public List<User> getUsersByRoot(){
+        return userRepository.findAllByRoleNotContaining("ROLE_ROOT");
+    }
 
 
     public void updateProfile(User user) throws UserException {
