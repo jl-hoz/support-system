@@ -40,7 +40,7 @@
         <form:select path="role" id="role" class="form-control">
             <option value="ROLE_CUSTOMER" selected>Customer</option>
             <option value="ROLE_SUPPORT">Support</option>
-            <option value="ROLE_ANALYSIS">Analysis</option>
+            <option value="ROLE_ANALYST">Analyst</option>
             <sec:authorize access="hasRole('ROOT')">
                 <option value="ROLE_ADMIN">Administrator</option>
             </sec:authorize>

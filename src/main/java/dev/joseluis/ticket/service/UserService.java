@@ -10,6 +10,7 @@ import org.springframework.security.core.AuthenticatedPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -21,6 +22,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private final Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -39,7 +43,8 @@ public class UserService {
             if(userExists)
                 throw new UserException("email already exists");
             // Generate random password
-            user.setPassword(UUID.randomUUID().toString());
+            String generated = UUID.randomUUID().toString();
+            user.setPassword(passwordEncoder.encode(generated));
             // Roles forbidden to create new users
             if(Arrays.stream(rolesForbiddenForCreation).anyMatch(role -> user.getRole().contentEquals(role))){
                 throw new UserException("user do not have necessary permissions for this operation");
@@ -47,7 +52,7 @@ public class UserService {
             // Save user to database
             userRepository.save(user);
             // Show generated password
-            logger.info("email: " + user.getEmail() + " | generated password: " + user.getPassword());
+            logger.info("email: " + user.getEmail() + " | generated password: " + generated);
         } catch (UserException e) {
             throw e;
         } catch (Exception e){
@@ -93,7 +98,7 @@ public class UserService {
             User updatedUser = userRepository.findByEmail(userDetails.getUsername())
                     .orElseThrow(() -> new UserException("email of authenticated user do no exists"));
             // Map only necessary elements
-            updatedUser.setPassword(user.getPassword());
+            updatedUser.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(updatedUser);
         }catch (UserException ex){
             throw ex;
