@@ -16,7 +16,10 @@
             <li><a href="/deactivate" class="nav-link">remove</a></li>
         </sec:authorize>
         <sec:authorize access="hasRole('ANALYST')">
-            <li><a href="/service/new" class="nav-link">new service</a></li>
+            <li>
+                <a href="/service/new" class="nav-link">new</a> /
+                <a href="/service/edit-status" class="nav-link">edit</a>
+            </li>
         </sec:authorize>
         <sec:authorize access="isAuthenticated()">
             <li><a href="/logout" class="nav-link">logout</a></li>

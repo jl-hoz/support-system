@@ -1,7 +1,9 @@
 package dev.joseluis.ticket.controller;
 
 import dev.joseluis.ticket.exception.UserException;
+import dev.joseluis.ticket.model.Service;
 import dev.joseluis.ticket.model.User;
+import dev.joseluis.ticket.service.ServiceServ;
 import dev.joseluis.ticket.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.security.Provider;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +27,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ServiceServ serviceRepository;
 
     private final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -46,6 +52,9 @@ public class UserController {
                         return user;
                     }).collect(Collectors.toList());
             model.addAttribute("userList", userList);
+        }else if(role.contains("ANALYST")){
+            List<Service> serviceList = serviceRepository.getServices();
+            model.addAttribute("serviceList", serviceList);
         }
         return "index";
     }

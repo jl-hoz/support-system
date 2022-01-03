@@ -33,5 +33,20 @@
         </c:forEach>
     </table>
 </sec:authorize>
+
+<sec:authorize access="hasRole('ANALYST')">
+    <table>
+        <tr>
+            <th>Service</th>
+            <th>Active</th>
+        </tr>
+        <c:forEach items="${serviceList}" var="service">
+            <tr>
+                <th>${service.name}</th>
+                <th>${service.active}</th>
+            </tr>
+        </c:forEach>
+    </table>
+</sec:authorize>
 </body>
 </html>
