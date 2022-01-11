@@ -21,4 +21,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     List<User> findAllByRoleNotContaining(String role);
     List<User> findAllByRoleNotContainingAndRoleNotContaining(String rootRole, String adminRole);
+
+    List<User> findAllByRoleContainingAndActiveIsTrue(String supportRole);
 }

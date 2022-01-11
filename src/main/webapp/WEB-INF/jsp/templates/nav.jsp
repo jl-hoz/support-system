@@ -21,6 +21,11 @@
                 <a href="/service/edit-status" class="nav-link">edit</a>
             </li>
         </sec:authorize>
+        <sec:authorize access="hasRole('CUSTOMER')">
+            <li>
+                <a href="/ticket/open" class="nav-link">open ticket</a>
+            </li>
+        </sec:authorize>
         <sec:authorize access="isAuthenticated()">
             <li><a href="/logout" class="nav-link">logout</a></li>
         </sec:authorize>

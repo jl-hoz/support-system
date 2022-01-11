@@ -46,7 +46,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/activate", "/deactivate").hasAnyRole("ROOT", "ADMIN")
-                .antMatchers("/service/**").hasAnyRole("ANALYST")
+                .antMatchers("/service/**").hasRole("ANALYST")
+                .antMatchers("/ticket/open").hasRole("CUSTOMER")
+                .antMatchers("/ticket/**").hasAnyRole("SUPPORT", "CUSTOMER")
                 .antMatchers("/profile").hasAnyRole("ADMIN", "ANALYST", "SUPPORT", "CUSTOMER")
                 .and().formLogin();
         http.logout(logout -> logout

@@ -48,5 +48,27 @@
         </c:forEach>
     </table>
 </sec:authorize>
+
+
+<sec:authorize access="hasAnyRole('SUPPORT', 'CUSTOMER')">
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Service</th>
+            <th>Subject</th>
+            <th>Creation</th>
+            <th>Status</th>
+        </tr>
+        <c:forEach items="${ticketList}" var="ticket">
+            <tr>
+                <th><a href="/ticket/${ticket.id}">${ticket.id}</a></th>
+                <th>${ticket.service.name}</th>
+                <th>${ticket.subject}</th>
+                <th>${ticket.created}</th>
+                <th>${ticket.status}</th>
+            </tr>
+        </c:forEach>
+    </table>
+</sec:authorize>
 </body>
 </html>

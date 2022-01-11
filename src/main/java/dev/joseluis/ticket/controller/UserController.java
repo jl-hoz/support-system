@@ -2,8 +2,10 @@ package dev.joseluis.ticket.controller;
 
 import dev.joseluis.ticket.exception.UserException;
 import dev.joseluis.ticket.model.Service;
+import dev.joseluis.ticket.model.Ticket;
 import dev.joseluis.ticket.model.User;
 import dev.joseluis.ticket.service.ServiceServ;
+import dev.joseluis.ticket.service.TicketService;
 import dev.joseluis.ticket.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,31 +33,55 @@ public class UserController {
     @Autowired
     private ServiceServ serviceRepository;
 
+    private TicketService ticketService;
+
     private final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/")
     public String home(ModelMap model){
-        String role = getPrincipalRole();
-        if(role.contains("ADMIN")){
-            // Get appropiate users and remove ROLE_ prefix from all users
-            List<User> userList = userService.getUsersByAdmin()
-                    .stream().map(user -> {
-                                user.setRole(user.getRole().substring(5).toLowerCase());
-                                return user;
-                    }).collect(Collectors.toList());
-            model.addAttribute("userList", userList);
-        }else if(role.contains("ROOT")){
-            // Get appropiate users and remove ROLE_ prefix from all users
-            List<User> userList = userService.getUsersByRoot()
-                    .stream().map(user -> {
-                        user.setRole(user.getRole().substring(5).toLowerCase());
-                        return user;
-                    }).collect(Collectors.toList());
-            model.addAttribute("userList", userList);
-        }else if(role.contains("ANALYST")){
-            List<Service> serviceList = serviceRepository.getServices();
-            model.addAttribute("serviceList", serviceList);
+        try{
+            String role = getPrincipalRole();
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            User userPrincipal = userService.getUserByEmail(userDetails.getUsername());
+            if(role.contains("ADMIN")){
+                // Get appropiate users and remove ROLE_ prefix from all users
+                List<User> userList = userService.getUsersByAdmin()
+                        .stream().map(user -> {
+                            user.setRole(user.getRole().substring(5).toLowerCase());
+                            return user;
+                        }).collect(Collectors.toList());
+                model.addAttribute("userList", userList);
+            }else if(role.contains("ROOT")){
+                // Get appropiate users and remove ROLE_ prefix from all users
+                List<User> userList = userService.getUsersByRoot()
+                        .stream().map(user -> {
+                            user.setRole(user.getRole().substring(5).toLowerCase());
+                            return user;
+                        }).collect(Collectors.toList());
+                model.addAttribute("userList", userList);
+            }else if(role.contains("ANALYST")){
+                List<Service> serviceList = serviceRepository.getServices();
+                model.addAttribute("serviceList", serviceList);
+            }else if(role.contains("CUSTOMER")){
+                List<Ticket> ticketList = ticketService.findAll().stream()
+                        .filter(ticket -> ticket.getCustomer().getId() == userPrincipal.getId())
+                        .collect(Collectors.toList());
+                model.addAttribute("ticketList", ticketList);
+            }else if(role.contains("SUPPORT")){
+                List<Ticket> ticketList = ticketService.findAllBySupport(userPrincipal).stream()
+                        .filter(ticket -> ticket.getSupport().getId() == userPrincipal.getId())
+                        .collect(Collectors.toList());
+                model.addAttribute("ticketList", ticketList);
+            }
+        }catch (Exception ex){
+            logger.error("GET /: " + ex.getMessage());
+            if(ex.getCause() != null){
+                logger.error("caused by: " + ex.getCause());
+            }
+            return "error";
         }
+
         return "index";
     }
 
@@ -188,4 +214,8 @@ public class UserController {
         return "redirect:/logout";
     }
 
+    @Autowired
+    private void setTicketService(TicketService ticketService){
+        this.ticketService = ticketService;
+    }
 }

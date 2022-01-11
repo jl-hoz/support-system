@@ -1,5 +1,7 @@
 package dev.joseluis.ticket.model;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 
@@ -29,6 +31,17 @@ public class User {
 
     @Column(name = "active", nullable = false)
     private Boolean active = true;
+
+    @Transient
+    private Integer availableTickets;
+
+    public Integer getAvailableTickets() {
+        return availableTickets;
+    }
+
+    public void setAvailableTickets(Integer availableTickets) {
+        this.availableTickets = availableTickets;
+    }
 
     public Boolean getActive() {
         return active;

@@ -37,4 +37,9 @@ public class ServiceServ {
     public List<Service> getServices() {
         return serviceRepository.findAll();
     }
+
+    public List<Service> getActiveServices() {
+        return serviceRepository.findAllByActiveIsTrue();
+    }
+
 }
