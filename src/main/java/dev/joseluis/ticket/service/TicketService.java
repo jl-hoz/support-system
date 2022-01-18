@@ -39,6 +39,10 @@ public class TicketService {
         logger.info(ticket.toString());
     }
 
+    public Optional<Ticket> get(int ticketID){
+        return ticketRepository.findById(ticketID);
+    }
+
     public void close(int ticketId, User user) {
         ticketRepository.closeTicket(ticketId, user);
     }
@@ -63,13 +67,13 @@ public class TicketService {
 //    public void linkTicketWithSupport() {
 //        logger.info("Current time is :: " + Calendar.getInstance().getTime());
 //        List<User> supportAvailable = userRepository.findAllByRoleContainingAndActiveIsTrue("ROLE_SUPPORT");
-//        supportAvailable.forEach((support) -> {
+//        List<User> supportList = supportAvailable.stream().map((support) -> {
 //            int availableOpenTickets = ticketRepository.getTicketByStatusIsTrueAndSupportIs(support.getId())
 //                    .orElse(0);
 //            support.setAvailableTickets(availableOpenTickets);
-//        });
-//        supportAvailable.sort(Comparator.comparing(User::getAvailableTickets));
-//        List<Ticket> ticketsNotLinked;
+//            return support;
+//        }).sorted(Comparator.comparingInt(User::getAvailableTickets)).toList();
+//        supportList.forEach(user -> System.out.println(user.getEmail() + " " + user.getAvailableTickets()));
 //    }
 
 

@@ -91,3 +91,9 @@ form button{
 a.nav-link{
     text-decoration: none;
 }
+
+.message{
+    margin: .5rem;
+    padding: .25rem;
+    background-color: lightgrey;
+}

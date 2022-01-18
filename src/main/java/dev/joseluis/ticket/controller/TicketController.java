@@ -1,9 +1,11 @@
 package dev.joseluis.ticket.controller;
 
 import dev.joseluis.ticket.exception.UserException;
+import dev.joseluis.ticket.model.Message;
 import dev.joseluis.ticket.model.Service;
 import dev.joseluis.ticket.model.Ticket;
 import dev.joseluis.ticket.model.User;
+import dev.joseluis.ticket.service.MessageService;
 import dev.joseluis.ticket.service.ServiceServ;
 import dev.joseluis.ticket.service.TicketService;
 import dev.joseluis.ticket.service.UserService;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -28,6 +31,10 @@ public class TicketController {
     private ServiceServ serviceServ;
     private TicketService ticketService;
     private UserService userService;
+
+    @Autowired
+    private MessageService messageService;
+
     private static final Logger logger = LoggerFactory.getLogger(TicketController.class);
 
     @GetMapping("/ticket/open")
@@ -44,7 +51,7 @@ public class TicketController {
     }
 
     @GetMapping("/ticket/{id}")
-    public String getTicket(@PathVariable String id, ModelMap model){
+    public String getTicket(@PathVariable String id, @ModelAttribute Message message, ModelMap model){
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
@@ -58,7 +65,10 @@ public class TicketController {
                 ticket = ticketService.findByIdSupport(Integer.parseInt(id), userPrincipal)
                         .orElseThrow(() -> new RuntimeException("Support user does not own ticket"));
             }
+            List<Message> messageList = messageService.getMessages(ticket);
+            messageList.sort(Comparator.comparing(Message::getCreated));
             model.addAttribute("ticket", ticket);
+            model.addAttribute("messageList", messageList);
         } catch (Exception e) {
             logger.error("GET /ticket/" + id + ": " + e.getMessage());
             if(e.getCause() != null){
