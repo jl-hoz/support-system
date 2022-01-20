@@ -47,7 +47,6 @@ public class MessageController {
                             .orElseThrow(() -> new RuntimeException("Ticket not found"));
             message.setMessage(ticket);
             messageService.sendMessage(message);
-            logger.info(message.toString());
         } catch (Exception e) {
             logger.error("GET /ticket/" + ticket_id + ": " + e.getMessage());
             if(e.getCause() != null){

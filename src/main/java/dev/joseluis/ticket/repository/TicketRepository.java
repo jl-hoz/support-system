@@ -21,6 +21,12 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     @Transactional
     void closeTicket(int ticketId, User customer);
 
+    @Modifying
+    @Query("UPDATE Ticket SET support = ?2 WHERE id = ?1")
+    @Transactional
+    void linkSupportToTicket(int ticketId, User support);
+
     Optional<Ticket> getTicketByIdAndSupport(int id, User support);
     List<Ticket> findAllBySupport(User support);
+    List<Ticket> findTicketsByStatusIsTrueAndSupportIsNull();
 }

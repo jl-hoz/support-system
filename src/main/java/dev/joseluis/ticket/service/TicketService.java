@@ -1,5 +1,6 @@
 package dev.joseluis.ticket.service;
 
+import dev.joseluis.ticket.exception.UserException;
 import dev.joseluis.ticket.model.Ticket;
 import dev.joseluis.ticket.model.User;
 import dev.joseluis.ticket.repository.TicketRepository;
@@ -14,10 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class TicketService {
@@ -34,9 +32,7 @@ public class TicketService {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException());
         ticket.setCustomer(user);
-        // TODO: ticket.setSupport(getAvailableSupport());
         ticketRepository.save(ticket);
-        logger.info(ticket.toString());
     }
 
     public Optional<Ticket> get(int ticketID){
@@ -63,30 +59,28 @@ public class TicketService {
         return ticketRepository.getTicketByIdAndSupport(id, support);
     }
 
-//    @Scheduled(cron = "*/10 * * * * *")
-//    public void linkTicketWithSupport() {
-//        logger.info("Current time is :: " + Calendar.getInstance().getTime());
-//        List<User> supportAvailable = userRepository.findAllByRoleContainingAndActiveIsTrue("ROLE_SUPPORT");
-//        List<User> supportList = supportAvailable.stream().map((support) -> {
-//            int availableOpenTickets = ticketRepository.getTicketByStatusIsTrueAndSupportIs(support.getId())
-//                    .orElse(0);
-//            support.setAvailableTickets(availableOpenTickets);
-//            return support;
-//        }).sorted(Comparator.comparingInt(User::getAvailableTickets)).toList();
-//        supportList.forEach(user -> System.out.println(user.getEmail() + " " + user.getAvailableTickets()));
-//    }
+    @Scheduled(cron = "1 * * * * *")
+    public void linkTicketWithSupport() {
+        try {
+            List<User> supportAvailable = userRepository.findAllByRoleContainingAndActiveIsTrue("ROLE_SUPPORT");
+            if(supportAvailable.isEmpty()){
+                throw new UserException("There is no support users to link to new tickets");
+            }
+            List<Ticket> ticketsToLink = ticketRepository.findTicketsByStatusIsTrueAndSupportIsNull();
+            ticketsToLink.forEach(ticket -> ticketRepository.linkSupportToTicket(ticket.getId(), supportAvailable.get(randomInteger(0, supportAvailable.size()-1))));
+            logger.info("New tickets available: " + ticketsToLink.size() + " | Linked " + ticketsToLink.size() + " tickets with support users");
+        } catch (Exception e) {
+            logger.error("linkTicketWithSupport: " + e.getMessage());
+            if(e.getCause() != null){
+                logger.error("caused by: " + e.getCause());
+            }
+        }
+    }
 
-
-//    public User getAvailableSupport(){
-//        List<User> supportAvailable = userRepository.findAllByRoleContainingAndActiveIsTrue("ROLE_SUPPORT");
-//        supportAvailable.stream().forEach((support) -> {
-//            int availableOpenTickets = ticketRepository.getTicketByStatusIsTrueAndSupportIs(support.getId())
-//                    .orElse(0);
-//            support.setAvailableTickets(availableOpenTickets);
-//        });
-//        supportAvailable.sort(Comparator.comparing(User::getAvailableTickets));
-//        return supportAvailable.stream().findFirst().orElseThrow(() -> new RuntimeException("No support users"));
-//    }
+    private static int randomInteger(int min, int max){
+        Random r = new Random();
+        return r.nextInt((max - min) + 1) + min;
+    }
 
     @Autowired
     private void getTicketRepository(TicketRepository ticketRepository){
